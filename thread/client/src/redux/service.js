@@ -10,7 +10,7 @@ import {
 export const serviceApi = createApi({
   reducerPath: "serviceApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: `${SERVER_URL}/api/`,
+    baseUrl: "http://localhost:5000/api/",
     credentials: "include",
   }),
   keepUnusedDataFor: 60 * 60 * 24 * 7,
@@ -22,7 +22,7 @@ export const serviceApi = createApi({
         method: "POST",
         body: data,
       }),
-      invalidateTags: ["Me"],
+      invalidateTags: () => ["Me"],
     }),
     login: builder.mutation({
       query: (data) => ({

@@ -3,28 +3,35 @@ const jwt = require("jsonwebtoken");
 
 const auth = async (req, res, next) => {
   try {
-    const token = req.cookies.token;
+    const token = req.cookies?.token; // Optional chaining to prevent errors
     if (!token) {
-      return res.status(400).json({ msg: "No token in auth !" });
+      return res.status(401).json({ msg: "Unauthorized: No token provided!" });
     }
-    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
-    if (!decodedToken) {
-      return res
-        .status(400)
-        .json({ msg: "Error while decoding token in auth !" });
+
+    let decodedToken;
+    try {
+      decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+      console.log("Decoded Token:", decodedToken);
+    } catch (err) {
+      return res.status(401).json({ msg: "Invalid or expired token!" });
     }
-    const user = await User.findById(decodedToken.token)
+
+    const user = await User.findById(decodedToken.id) // Ensure correct field
       .populate("followers")
       .populate("threads")
       .populate("replies")
       .populate("reposts");
+
     if (!user) {
-      return res.status(400).json({ msg: "No user found !" });
+      return res.status(404).json({ msg: "User not found!" });
     }
+
     req.user = user;
     next();
   } catch (err) {
-    return res.status(400).json({ msg: "Error in auth !", err: err.message });
+    return res
+      .status(500)
+      .json({ msg: "Server error in auth!", error: err.message });
   }
 };
 
