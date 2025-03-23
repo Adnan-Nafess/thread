@@ -12,7 +12,8 @@ connectDB();
 app.use(
   cors({
     origin: "https://thread-86gi.vercel.app",
-    credentials: true,
+   methods: "GET,POST,PUT,DELETE",
+  credentials: true,
   })
 );
 app.use(express.json());
